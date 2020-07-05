@@ -6,7 +6,7 @@ class State:
 
     @staticmethod
     def init_black_positions():
-        return State.gen_start_positions(8, 8, -1)
+        return State.gen_start_positions(7, 7, -1)
 
     @staticmethod
     def init_white_positions():
@@ -21,15 +21,15 @@ class State:
         checker_count = State.counter_count()
         checker_list = range(checker_count)
 
-        indent = False
+        indent = True
         positions = {}
 
         for n in checker_list:
             positions[n] = (inner_x, inner_y)
-            inner_x += direction
-            if inner_x == State.board_size[0]:
+            inner_x += (direction * 2)
+            if inner_x >= State.board_size[0] or inner_x <= -1:
                 inner_y += direction
-                inner_x = direction if indent else 0
+                inner_x = x + direction if indent else x
                 indent = not indent
 
         return positions
@@ -91,6 +91,14 @@ class State:
         del positions[checker]
 
         return self.get_with_new_positions(colour, positions)
+
+    def get_for_row(self, y):
+        black_row = {v: "b" + str(k) for (k, v) in self._blackPositions.items() if v[1] == y}
+        white_row = {v: "w" + str(k) for (k, v) in self._whitePositions.items() if v[1] == y}
+
+        to_ret = dict(black_row)
+        to_ret.update(white_row)
+        return to_ret
 
     def has_finished(self):
         if len(self._blackPositions) == 0:
