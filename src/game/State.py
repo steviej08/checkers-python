@@ -1,4 +1,4 @@
-from Logic import Color
+from src.game.Logic import Color
 
 
 class State:
