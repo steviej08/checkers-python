@@ -13,25 +13,25 @@ class Color(enum.Enum):
     White = False
 
 
-def move(state, color, direction, count_id):
-    if check_move_constraint(state, color, direction, count_id):
+def move(state, color, position, count_id):
+    if check_move_constraint(state, color, position, count_id):
         raise Exception("Incorrect parameters.")
 
-    checker_position = state.get_black_position(count_id) if color == Color.Black \
-        else state.get_white_position(count_id)
+    # checker_position = state.get_black_position(count_id) if color == Color.Black \
+    #     else state.get_white_position(count_id)
 
-    new_position = {
-        Direction.NorthWest: (checker_position[0] + 1, checker_position[1] - 1),
-        Direction.NorthEast: (checker_position[0] + 1, checker_position[1] + 1),
-        Direction.SouthWest: (checker_position[0] - 1, checker_position[1] - 1),
-        Direction.SouthEast: (checker_position[0] - 1, checker_position[1] + 1)
-    }[direction]
+    # new_position = {
+    #     Direction.NorthWest: (checker_position[0] + 1, checker_position[1] - 1),
+    #     Direction.NorthEast: (checker_position[0] + 1, checker_position[1] + 1),
+    #     Direction.SouthWest: (checker_position[0] - 1, checker_position[1] - 1),
+    #     Direction.SouthEast: (checker_position[0] - 1, checker_position[1] + 1)
+    # }[direction]
 
-    return state.get_with_new_position(color, count_id, new_position)
+    return state.get_with_new_position(color, count_id, position)
 
 
 def check_move_constraint(state, color, direction, count_id):
-    return True
+    return False
 
 
 def take(state, color, direction, take_id, taken_id):

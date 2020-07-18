@@ -106,3 +106,35 @@ class State:
         if len(self._whitePositions) == 0:
             return Color.White
         return None
+
+    def get_valid_moves(self, colour, counter_id):
+        my_counters = self._blackPositions if colour == Color.Black else self._whitePositions
+        their_counters = self._blackPositions if colour == Color.White else self._whitePositions
+
+        current_position = my_counters[counter_id]
+
+        all_possible_moves = [(current_position[0] + x, current_position[1] + y)
+                              for y in [-2, -1, 1, 2] for x in [-2, -1, 1, -2] if abs(x) == abs(y)]
+
+        def is_valid(position):
+            all_positions = list(my_counters.values()) + list(their_counters.values())
+
+            if position in all_positions:
+                return False
+
+            is_outer = abs(position[0] - current_position[0]) == 2
+
+            if not is_outer:
+                return True
+
+            between_pos = (position[0] - current_position[0] / 2, position[1] - current_position[1] / 2)
+
+            return True if between_pos in their_counters.values() else False
+
+        valid_positions = [x for x in all_possible_moves if is_valid(x)]
+
+        return valid_positions
+
+    def get_moves_for(self, colour):
+        all_positions = self._blackPositions if colour == Color.Black else self._whitePositions
+        return {k: v for k, v in all_positions.items() if len(self.get_valid_moves(colour, k)) != 0}
