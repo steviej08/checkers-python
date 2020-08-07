@@ -54,12 +54,6 @@ class State:
         else:
             self._whitePositions = white_positions
 
-    def get_with_new_positions(self, colour, positions):
-        if colour == Color.Black:
-            return State(positions, self._whitePositions)
-
-        return State(self._blackPositions, positions)
-
     def get_position(self, color, checker):
 
         if checker not in range(State.counter_count()):
@@ -70,27 +64,55 @@ class State:
 
         return self._whitePositions[checker]
 
-    def get_with_new_position(self, colour, checker, position):
+    def new_black_positions(self, positions):
+        return State(positions, self._blackPositions)
+
+    def new_white_positions(self, positions):
+        return State(self._blackPositions, positions)
+
+    def new_black_position(self, checker, position):
 
         if checker not in range(State.counter_count()):
             raise Exception("Checker ID is invalid.")
 
-        positions = self._blackPositions.copy() if colour == Color.Black else self._whitePositions.copy()
+        positions = self._blackPositions.copy()
 
         positions[checker] = position
 
-        return self.get_with_new_positions(colour, positions)
+        return self.new_black_positions(positions)
 
-    def get_with_removed_counter(self, colour, checker):
+    def new_white_position(self, checker, position):
 
         if checker not in range(State.counter_count()):
             raise Exception("Checker ID is invalid.")
 
-        positions = self._blackPositions.copy() if colour == Color.Black else self._whitePositions.copy()
+        positions = self._whitePositions.copy()
+
+        positions[checker] = position
+
+        return self.new_black_positions(positions)
+
+    def remove_black_counter(self, checker):
+
+        if checker not in range(State.counter_count()):
+            raise Exception("Checker ID is invalid.")
+
+        positions = self._blackPositions.copy()
 
         del positions[checker]
 
-        return self.get_with_new_positions(colour, positions)
+        return self.new_black_positions(positions)
+
+    def remove_white_counter(self, checker):
+
+        if checker not in range(State.counter_count()):
+            raise Exception("Checker ID is invalid.")
+
+        positions = self._whitePositions.copy()
+
+        del positions[checker]
+
+        return self.new_white_positions(positions)
 
     def get_for_row(self, y):
         black_row = {v: "b" + str(k) for (k, v) in self._blackPositions.items() if v[1] == y}
