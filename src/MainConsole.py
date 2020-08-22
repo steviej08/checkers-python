@@ -1,6 +1,6 @@
 from src.console.Draw import draw_state
 from src.console.UserInteractions import do_quit, ask_to_move, ask_to_choose_counter
-from src.game.Logic import Color
+from src.game.Actions import Colour
 from src.game.State import State
 
 # initial state
@@ -10,7 +10,7 @@ draw_state(state, State.board_size)
 
 print("")
 
-player = Color.White
+player = Colour.White
 
 # start game
 while not do_quit():

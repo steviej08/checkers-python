@@ -1,4 +1,5 @@
-from src.game.Logic import Color
+from src.game.Actions import Colour
+from src.game.Counter import Counter
 
 
 class State:
@@ -6,14 +7,14 @@ class State:
 
     @staticmethod
     def init_black_positions():
-        return State.gen_start_positions(7, 7, -1)
+        return State.gen_start_positions(7, 7, -1, Colour.Black)
 
     @staticmethod
     def init_white_positions():
-        return State.gen_start_positions(0, 0, 1)
+        return State.gen_start_positions(0, 0, 1, Colour.White)
 
     @staticmethod
-    def gen_start_positions(x, y, direction):
+    def gen_start_positions(x, y, direction, colour):
 
         inner_x = x
         inner_y = y
@@ -25,11 +26,11 @@ class State:
         positions = {}
 
         for n in checker_list:
-            positions[n] = (inner_x, inner_y)
-            inner_x += (direction * 2)
-            if inner_x >= State.board_size[0] or inner_x <= -1:
-                inner_y += direction
-                inner_x = x + direction if indent else x
+            positions[n] = Counter(n, colour, (inner_x, inner_y))
+            inner_y += (direction * 2)
+            if inner_y >= State.board_size[0] or inner_y <= -1:
+                inner_x += direction
+                inner_y = x + direction if indent else x
                 indent = not indent
 
         return positions
@@ -42,7 +43,7 @@ class State:
 
         return int((State.board_size[0] / 2) * 3)
 
-    def __init__(self, black_positions=None, white_positions=None):
+    def __init__(self, black_positions=None, white_positions=None, turn=None):
 
         if black_positions is None:
             self._blackPositions = State.init_black_positions()
@@ -54,15 +55,28 @@ class State:
         else:
             self._whitePositions = white_positions
 
-    def get_position(self, color, checker):
+        if not hasattr(self, "_turn"):
+            self._turn = Colour.White
+        elif turn is not None:
+            self._turn = turn
+        else:
+            self.turn = self.check_turn()
 
-        if checker not in range(State.counter_count()):
+    def get_turn(self):
+        return self._turn
+
+    def check_turn(self):
+        return self._turn
+
+    def get_position(self, color, counter_id):
+
+        if counter_id not in range(State.counter_count()):
             raise Exception("Checker ID is invalid.")
 
-        if color == Color.Black:
-            return self._blackPositions[checker]
+        if color == Colour.Black:
+            return self._blackPositions[counter_id].position
 
-        return self._whitePositions[checker]
+        return self._whitePositions[counter_id].position
 
     def new_black_positions(self, positions):
         return State(positions, self._blackPositions)
@@ -124,22 +138,31 @@ class State:
 
     def has_finished(self):
         if len(self._blackPositions) == 0:
-            return Color.Black
+            return Colour.Black
         if len(self._whitePositions) == 0:
-            return Color.White
+            return Colour.White
         return None
 
     def get_valid_moves(self, colour, counter_id):
-        my_counters = self._blackPositions if colour == Color.Black else self._whitePositions
-        their_counters = self._blackPositions if colour == Color.White else self._whitePositions
+        my_counters = self._blackPositions if colour == Colour.Black else self._whitePositions
+        their_counters = self._blackPositions if colour == Colour.White else self._whitePositions
 
-        current_position = my_counters[counter_id]
+        counter = my_counters[counter_id]
+        current_position = counter.position
 
-        all_possible_moves = [(current_position[0] + x, current_position[1] + y)
-                              for y in [-2, -1, 1, 2] for x in [-2, -1, 1, -2] if abs(x) == abs(y)]
+        king_moves = [(current_position[0] + x, current_position[1] + y)
+                      for y in [-2, -1, 1, 2] for x in [-2, -1, 1, 2] if abs(x) == abs(y)]
+
+        normal_moves = [(current_position[0] + x, current_position[1] + y)
+                        for y in [-2, -1, 1, 2] for x in [1, 2] if abs(x) == abs(y)]
+
+        this_counter_moves = king_moves if counter.is_king else normal_moves
 
         def is_valid(position):
-            all_positions = list(my_counters.values()) + list(their_counters.values())
+            all_positions = [x.position for x in my_counters.values()] + [x.position for x in their_counters.values()]
+
+            if position[0] < 0 or position[1] < 0:
+                return False
 
             if position in all_positions:
                 return False
@@ -153,10 +176,10 @@ class State:
 
             return True if between_pos in their_counters.values() else False
 
-        valid_positions = [x for x in all_possible_moves if is_valid(x)]
+        valid_positions = [x for x in this_counter_moves if is_valid(x)]
 
         return valid_positions
 
     def get_moves_for(self, colour):
-        all_positions = self._blackPositions if colour == Color.Black else self._whitePositions
+        all_positions = self._blackPositions if colour == Colour.Black else self._whitePositions
         return {k: v for k, v in all_positions.items() if len(self.get_valid_moves(colour, k)) != 0}

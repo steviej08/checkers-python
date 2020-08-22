@@ -8,9 +8,10 @@ class Direction(enum.Enum):
     SouthEast = 4
 
 
-class Color(enum.Enum):
+class Colour(enum.Enum):
     Black = True
     White = False
+
 
 def move(state, color, position, count_id):
     if check_move_constraint(state, color, position, count_id):
