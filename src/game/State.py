@@ -68,6 +68,9 @@ class State:
     def check_turn(self):
         return self._turn
 
+    def next_turn(self):
+        return State(self._blackPositions, self._whitePositions, not self._turn)
+
     def get_position(self, color, counter_id):
 
         if counter_id not in range(State.counter_count()):
@@ -91,9 +94,7 @@ class State:
 
         positions = self._blackPositions.copy()
 
-        positions[checker] = position
-
-        return self.new_black_positions(positions)
+        return self.new_black_positions(self._new_position(positions, checker, position))
 
     def new_white_position(self, checker, position):
 
@@ -102,9 +103,14 @@ class State:
 
         positions = self._whitePositions.copy()
 
-        positions[checker] = position
+        return self.new_white_positions(self._new_position(positions, checker, position))
 
-        return self.new_black_positions(positions)
+    def _new_position(self, positions, checker, position):
+
+        old_position = positions[checker]
+
+        positions[checker] = Counter(old_position.id, old_position.colour, position, old_position.is_king)
+        return positions
 
     def remove_black_counter(self, checker):
 
@@ -128,13 +134,27 @@ class State:
 
         return self.new_white_positions(positions)
 
-    def get_for_row(self, y):
-        black_row = {v: "b" + str(k) for (k, v) in self._blackPositions.items() if v[1] == y}
-        white_row = {v: "w" + str(k) for (k, v) in self._whitePositions.items() if v[1] == y}
+    def get_for_row(self, x):
+        black_row = {v.position: "b" + str(k) for (k, v) in self._blackPositions.items() if v.position[0] == x}
+        white_row = {v.position: "w" + str(k) for (k, v) in self._whitePositions.items() if v.position[0] == x}
 
         to_ret = dict(black_row)
         to_ret.update(white_row)
         return to_ret
+
+    def get_at_position(self, x, y):
+        black_counters = [v for (k, v) in self._blackPositions.items() if v.position[1] == y and v.position[0] == x]
+        white_counters = [v for (k, v) in self._blackPositions.items() if v.position[1] == y and v.position[0] == x]
+
+        all_positions = black_counters + white_counters
+
+        if len(all_positions) > 1:
+            raise Exception("More than one counter at position " + str(x) + ", " + str(y))
+
+        if len(all_positions) == 0:
+            return None
+
+        return all_positions[0]
 
     def has_finished(self):
         if len(self._blackPositions) == 0:

@@ -13,43 +13,70 @@ class Colour(enum.Enum):
     White = False
 
 
-def move(state, color, position, count_id):
-    if check_move_constraint(state, color, position, count_id):
+def move(state, colour, count_id, new_position):
+
+    position = state.get_position(colour, count_id)
+
+    if abs(position[0] - new_position[0]) == 2:
+        return move(state, colour, count_id, new_position)
+
+    if not check_move_constraint(state, colour, count_id, new_position):
         raise Exception("Incorrect parameters.")
 
-    # checker_position = state.get_black_position(count_id) if color == Color.Black \
-    #     else state.get_white_position(count_id)
+    move_state = state.new_black_position(count_id, new_position) if colour == Colour.Black \
+        else state.new_white_position(count_id, new_position)
 
-    # new_position = {
-    #     Direction.NorthWest: (checker_position[0] + 1, checker_position[1] - 1),
-    #     Direction.NorthEast: (checker_position[0] + 1, checker_position[1] + 1),
-    #     Direction.SouthWest: (checker_position[0] - 1, checker_position[1] - 1),
-    #     Direction.SouthEast: (checker_position[0] - 1, checker_position[1] + 1)
-    # }[direction]
-
-    return state.get_with_new_position(color, count_id, position)
+    return move_state.next_turn()
 
 
-def check_move_constraint(state, color, direction, count_id):
-    return False
+def check_move_constraint(state, colour, count_id, new_position):
+
+    possible_moves = state.get_valid_moves(colour, count_id)
+
+    if new_position not in possible_moves:
+        return False
+
+    position = state.get_position(colour, count_id)
+
+    return abs(position[0] - new_position[0]) == 1
 
 
-def take(state, color, direction, take_id, taken_id):
-    if check_take_constraint(state, color, direction, take_id):
+def take(state, colour, count_id, new_position):
+
+    if not check_take_constraint(state, colour, count_id, new_position):
         raise Exception("Incorrect parameters.")
 
-    take_position = state.get_position(color, take_id)
+    move_state = state.new_black_position(count_id, new_position) if colour == Colour.Black \
+        else state.new_white_position(count_id, new_position)
 
-    take_new_position = {
-        Direction.NorthWest: (take_position[0] + 2, take_position[1] - 2),
-        Direction.NorthEast: (take_position[0] + 2, take_position[1] + 2),
-        Direction.SouthWest: (take_position[0] - 2, take_position[1] - 2),
-        Direction.SouthEast: (take_position[0] - 2, take_position[1] + 2)
-    }[direction]
+    position = state.get_position(colour, count_id)
 
-    state1 = state.get_with_new_position(color, take_id, take_new_position)
-    return state1.get_with_removed_counter(not color, taken_id)
+    expected_take_position = [int(position(0) + ((position(0) - new_position(0))/2)),
+                              int(position(1) + ((position(1) - new_position(1))/2))]
+
+    take_counter = state.get_at_position(expected_take_position[0], expected_take_position[1])
+
+    if take_counter is None:
+        raise Exception("Unable to take as nothing to take.")
+
+    return move_state.get_with_removed_counter(not colour, take_counter.id)
 
 
-def check_take_constraint(state, color, direction, count_id):
-    return True
+def check_take_constraint(state, colour, count_id, new_position):
+
+    possible_moves = state.get_valid_moves(colour)
+
+    if new_position not in possible_moves:
+        return False
+
+    position = state.get_position(colour, count_id)
+
+    if abs(position(0) - new_position(0)) != 2:
+        return False
+
+    expected_take_position = [int(position(0) + ((position(0) - new_position(0))/2)),
+                              int(position(1) + ((position(1) - new_position(1))/2))]
+
+    take_counter = state.get_for_row(expected_take_position[1])[expected_take_position]
+
+    return take_counter[0] == "w" if colour == Colour.Black else take_counter[1] == "b"
