@@ -2,6 +2,14 @@ from src.game.Actions import Colour
 from src.game.Counter import Counter
 
 
+def _new_position(positions, checker, position):
+
+    old_position = positions[checker]
+
+    positions[checker] = Counter(old_position.id, old_position.colour, position, old_position.is_king)
+    return positions
+
+
 class State:
     board_size = (8, 8)
 
@@ -94,7 +102,7 @@ class State:
 
         positions = self._blackPositions.copy()
 
-        return self.new_black_positions(self._new_position(positions, checker, position))
+        return self.new_black_positions(_new_position(positions, checker, position))
 
     def new_white_position(self, checker, position):
 
@@ -103,14 +111,7 @@ class State:
 
         positions = self._whitePositions.copy()
 
-        return self.new_white_positions(self._new_position(positions, checker, position))
-
-    def _new_position(self, positions, checker, position):
-
-        old_position = positions[checker]
-
-        positions[checker] = Counter(old_position.id, old_position.colour, position, old_position.is_king)
-        return positions
+        return self.new_white_positions(_new_position(positions, checker, position))
 
     def remove_black_counter(self, checker):
 
