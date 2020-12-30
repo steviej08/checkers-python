@@ -1,15 +1,20 @@
 
 class Node:
 
-    def __init__(self, move_id, parent=None, winner=None):
+    def __init__(self, move_id, player, parent=None):
         self.value = 0
+        self.player = player
         self.move_id = move_id
-        self.children = None
+        self.children = []
         self.parent = parent
-        self.winner = winner
+        self.number_visits = 1
+        self.number_wins = 0
 
         if parent is not None:
             parent.add_child(self)
+
+    def get_player(self):
+        return self.player
 
     def get_value(self):
         return self.value
@@ -24,8 +29,6 @@ class Node:
         return self.children
 
     def add_child(self, child):
-        if self.children is None:
-            self.children = []
         self.children.append(child)
 
     def get_parent(self):
@@ -34,8 +37,17 @@ class Node:
     def is_root(self):
         return self.parent is None
 
-    def is_winner(self):
-        return self.winner is not None
+    def is_leaf(self):
+        return len(self.children) == 0
 
-    def get_winner(self):
-        return self.winner
+    def get_number_visits(self):
+        return self.number_visits
+
+    def visited(self):
+        self.number_visits += 1
+
+    def get_number_wins(self):
+        return self.number_wins
+
+    def won(self):
+        self.number_wins += 1

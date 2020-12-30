@@ -27,24 +27,25 @@ def choose_child(children):
     :param children: List of nodes
     :return: Node
     """
+    def take_value(node):
+        return node.value
+
     if children is None or children.len < 1:
         raise Exception("Children must exist")
-    children.sort()
+    children.sort(key=take_value)
     return children(0)
 
 
 def expansion(node):
     """
     Choose a random node to expand to
-    TODO: This could be extended to choose multiple nodes
-    TODO: The chosen node will affect state (i.e. whose turn)
     :param node:
     :return:
     """
     children = node.children
     if children is None or children.len < 1:
         raise Exception("Children must exist")
-    return random.choice(node.children)
+    return random.choice(node.get_children())
 
 
 def simulation(state, node, simulate):
@@ -55,27 +56,35 @@ def simulation(state, node, simulate):
     :param simulate: Function that takes a state and node and returns a new state
     :return: Winning node
     """
-    old_node = node
-    new_node = node
-    chosen_move = old_node.get_move_id()
+    new_state = simulate(state, node.get_move_id())
+    winner = state.get_winner()
 
-    while True:
-        new_state = simulate(state, chosen_move)
-        winner = new_state.get_winner
-        move_id = random.choice(new_state.get_valid_moves)
-        if winner is not None:
-            new_node = Node(move_id, old_node)
-            old_node = new_node
-        else:
-            break
+    if winner is not None:
+        return winner
 
-    return new_node
+    move_id = random.choice(new_state.get_valid_moves())
+    player = new_state.current_player()
+    new_node = Node(move_id, player, node)
+
+    return simulation(new_state, new_node, simulate)
 
 
-def backpropagation(node):
+def backpropagation(node, stop_node, winner):
     """
     Update nodes with new weights based on simulation
     :param node: Winning node
+    :param stop_node: The node that started simulation
+    :param winner: The winner of the previous simulation
     :return: root node
     """
-    raise NotImplemented
+    if node == stop_node:
+        return node
+
+    if node.is_leaf:
+        return backpropagation(node.get_parent(), stop_node, winner)
+
+    node.visited()
+    if winner == node.get_player():
+        node.won()
+
+    return backpropagation(node.get_parent(), stop_node, winner)
