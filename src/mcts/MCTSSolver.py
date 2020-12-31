@@ -1,17 +1,55 @@
+from src.mcts.MCTS import *
+from src.mcts.Node import Node
+from time import monotonic
+
 
 class MCTSSolver:
 
-    def __init__(self, simulate):
+    def __init__(self, start_player, simulate):
         self.simulate = simulate
-        # TODO: Keep record of node states
+        self.search_tree = Node("root", start_player)
 
-    def get_move(self, moves):
-
-        # -- Select the nodes
-        # -- Expand
-        # -- Simulate
-        # -- backpropogate
-        # -- repeat until 30 seconds is up
-        # -- return the best move of children
+    def get_move(self, move_ids):
 
         raise NotImplemented
+
+        # give the solver 10 seconds to choose its move
+        current_time = monotonic()
+        to_stop = current_time + 10
+
+        while monotonic() < to_stop:
+            selected_node = selection(self.search_tree)
+
+            # add children to selected node
+            state = self.get_state_for(selected_node)
+            selected_node.set_children(
+                map(lambda m: Node(m, state.get_player()), state.get_valid_moves()))
+
+            expanded_node = expansion(selected_node)
+
+            state, leaf_node = simulation(state, expanded_node, self.simulate)
+
+            backpropagation(leaf_node, state.get_player())
+
+        # using move_ids simulate and choose the best weighted node
+
+    def get_state_for(self, node):
+
+        moves = []
+
+        def get_move(inner_node):
+            if inner_node.is_parent():
+                return
+            moves.append(inner_node)
+            get_move(inner_node.get_parent())
+
+        get_move(node)
+
+        state = self.simulate()
+
+        for n in reversed(moves):
+            new_state = self.simulate(state, n.get_move_id())
+            state = new_state
+
+        return state
+

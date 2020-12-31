@@ -60,7 +60,7 @@ def simulation(state, node, simulate):
     winner = state.get_winner()
 
     if winner is not None:
-        return winner
+        return state, winner
 
     move_id = random.choice(new_state.get_valid_moves())
     player = new_state.current_player()
@@ -69,22 +69,21 @@ def simulation(state, node, simulate):
     return simulation(new_state, new_node, simulate)
 
 
-def backpropagation(node, stop_node, winner):
+def backpropagation(node, winner):
     """
     Update nodes with new weights based on simulation
     :param node: Winning node
-    :param stop_node: The node that started simulation
     :param winner: The winner of the previous simulation
     :return: root node
     """
-    if node == stop_node:
+    if node.is_parent():
         return node
 
     if node.is_leaf:
-        return backpropagation(node.get_parent(), stop_node, winner)
+        return backpropagation(node.get_parent(), winner)
 
     node.visited()
     if winner == node.get_player():
         node.won()
 
-    return backpropagation(node.get_parent(), stop_node, winner)
+    return backpropagation(node.get_parent(), winner)
