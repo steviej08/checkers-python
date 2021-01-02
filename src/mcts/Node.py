@@ -1,6 +1,10 @@
 
 class Node:
 
+    @staticmethod
+    def root(start_player):
+        return Node("root", start_player)
+
     def __init__(self, move_id, player, parent=None):
         self.value = 0
         self.player = player

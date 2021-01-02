@@ -7,11 +7,9 @@ class MCTSSolver:
 
     def __init__(self, start_player, simulate):
         self.simulate = simulate
-        self.search_tree = Node("root", start_player)
+        self.search_tree = Node.root(start_player)
 
     def get_move(self, move_ids):
-
-        raise NotImplemented
 
         # give the solver 10 seconds to choose its move
         current_time = monotonic()
@@ -31,7 +29,12 @@ class MCTSSolver:
 
             backpropagation(leaf_node, state.get_player())
 
-        # using move_ids simulate and choose the best weighted node
+        next_node = self.search_tree
+
+        for move_id in move_ids:
+            next_node = next_node.children[move_id]
+
+        return choose_child(next_node.children)
 
     def get_state_for(self, node):
 
