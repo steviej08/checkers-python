@@ -17,6 +17,15 @@ class Node:
         if parent is not None:
             parent.add_child(self)
 
+    def has_children(self):
+        return len(self.children) > 0
+
+    def set_children(self, children):
+        if type(children) != list:
+            raise Exception("Children must be an a list")
+
+        self.children = children
+
     def get_player(self):
         return self.player
 

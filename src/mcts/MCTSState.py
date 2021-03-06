@@ -8,9 +8,9 @@ class MCTSState(ABC):
         pass
 
     @abstractmethod
-    def current_player(self):
+    def get_valid_moves(self):
         pass
 
     @abstractmethod
-    def get_valid_moves(self):
+    def get_player(self):
         pass

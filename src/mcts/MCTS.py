@@ -18,7 +18,7 @@ def selection(node):
 
     node = choose_child(node.get_children())
 
-    selection(node)
+    return selection(node)
 
 
 def choose_child(children):
@@ -30,22 +30,23 @@ def choose_child(children):
     def take_value(node):
         return node.value
 
-    if children is None or children.len < 1:
+    if children is None or len(children) < 1:
         raise Exception("Children must exist")
     children.sort(key=take_value)
-    return children(0)
+    return children[0]
 
 
-def expansion(node):
+def expansion(node, choose=random.choice):
     """
     Choose a random node to expand to
+    :param choose: Function in which to choose expansion child
     :param node:
     :return:
     """
     children = node.children
-    if children is None or children.len < 1:
+    if children is None or len(children) < 1:
         raise Exception("Children must exist")
-    return random.choice(node.get_children())
+    return choose(node.get_children())
 
 
 def simulation(state, node, simulate):
@@ -56,14 +57,17 @@ def simulation(state, node, simulate):
     :param simulate: Function that takes a state and node and returns a new state
     :return: Winning node
     """
-    new_state = simulate(state, node.get_move_id())
+    new_state = simulate(node.get_move_id(), state)
     winner = state.get_winner()
 
     if winner is not None:
-        return state, winner
+        return node, winner
+
+    if len(new_state.get_valid_moves()) == 0:
+        return node, None
 
     move_id = random.choice(new_state.get_valid_moves())
-    player = new_state.current_player()
+    player = new_state.get_player()
     new_node = Node(move_id, player, node)
 
     return simulation(new_state, new_node, simulate)
@@ -76,10 +80,10 @@ def backpropagation(node, winner):
     :param winner: The winner of the previous simulation
     :return: root node
     """
-    if node.is_parent():
+    if node.is_root():
         return node
 
-    if node.is_leaf:
+    if node.is_leaf():
         return backpropagation(node.get_parent(), winner)
 
     node.visited()

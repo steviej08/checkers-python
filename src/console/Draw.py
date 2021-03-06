@@ -15,4 +15,4 @@ def draw_state(state, board_size):
 
         to_print = "".join(line_text)
 
-        print("| " + to_print + " |")
+        print("| " + to_print + "|")
