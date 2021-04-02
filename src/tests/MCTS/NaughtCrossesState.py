@@ -1,6 +1,6 @@
 from abc import ABC
 
-from src.mcts.MCTSState import MCTSState
+from mcts.MCTSState import MCTSState
 
 
 def _init_grid():
