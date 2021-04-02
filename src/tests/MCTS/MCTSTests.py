@@ -1,7 +1,7 @@
 import unittest
 
-from src.mcts.MCTSSolver import MCTSSolver, max_iter, max_time_s, expansion_choose_meth
-from src.tests.MCTS.NaughtCrossesState import NaughtCrossesState
+from mcts.MCTSSolver import MCTSSolver, max_iter, max_time_s, expansion_choose_meth
+from tests.MCTS.NaughtCrossesState import NaughtCrossesState
 
 
 def simulate(move, state=None):

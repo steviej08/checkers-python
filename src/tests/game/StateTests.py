@@ -1,7 +1,7 @@
 import unittest
 
-from src.game.Actions import Colour
-from src.game.State import State
+from game.Actions import Colour
+from game.State import State
 
 # | O - O - O - O -  |
 # | - O - O - O - O  |

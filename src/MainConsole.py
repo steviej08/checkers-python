@@ -1,8 +1,8 @@
-from src.console.Console import Console
-from src.console.Draw import draw_state
-from src.console.Interaction import ask_to_move, ask_to_choose_counter
-from src.game.Actions import Colour
-from src.game.State import State
+from console.Console import Console
+from console.Draw import draw_state
+from console.Interaction import ask_to_move, ask_to_choose_counter
+from game.Actions import Colour
+from game.State import State
 
 
 class CheckersConsole(Console):
