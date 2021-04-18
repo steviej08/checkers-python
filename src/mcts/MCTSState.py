@@ -4,6 +4,10 @@ from abc import ABC, abstractmethod
 class MCTSState(ABC):
 
     @abstractmethod
+    def has_finished(self):
+        pass
+
+    @abstractmethod
     def get_winner(self):
         pass
 

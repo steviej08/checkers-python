@@ -84,8 +84,17 @@ class MCTSSolver:
         for move_id in move_ids:
             next_node = next_node.children[move_id]
 
+        # if we have no children, either the game has finished
+        # or, we have not done enough iterations for this path
         if not next_node.has_children():
-            return None
+            # has the game finished?
+            next_node_state = self.get_state_for(next_node)
+            if next_node_state.has_finished():
+                return None
+            # populate a child
+            next_node.set_children(
+                list(map(lambda m: Node(m, next_node_state.get_player(), selected_node), next_node_state.get_valid_moves()))
+            )
 
         node = choose_child(next_node.children)
         return node.get_move_id()

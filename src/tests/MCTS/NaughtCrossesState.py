@@ -17,6 +17,9 @@ class NaughtCrossesState(MCTSState, ABC):
     def get_valid_moves(self):
         return [x for x in range(NaughtCrossesState.grid_size) if self.grid[x] is None]
 
+    def has_finished(self):
+        return len(self.get_valid_moves()) == 0
+
     def get_winner(self):
         if self.has_won(True):
             return True
