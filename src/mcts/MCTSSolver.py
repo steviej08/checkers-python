@@ -1,5 +1,5 @@
-from MCTS import *
-from Node import Node
+from src.mcts.MCTS import *
+from src.mcts.Node import Node
 from time import monotonic
 
 max_iter = "MAX_ITERATIONS"

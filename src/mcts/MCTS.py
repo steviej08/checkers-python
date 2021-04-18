@@ -1,6 +1,5 @@
 import random
-
-from Node import Node
+from src.mcts.Node import Node
 
 
 def selection(node):

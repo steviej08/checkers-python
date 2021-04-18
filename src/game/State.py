@@ -1,5 +1,5 @@
-from Actions import Colour
-from Counter import Counter
+from src.game.Actions import Colour
+from src.game.Counter import Counter
 
 
 def _new_position(positions, checker, position):
