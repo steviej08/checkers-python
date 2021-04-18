@@ -1,6 +1,6 @@
 from abc import ABC
 
-from mcts.MCTSState import MCTSState
+from src.mcts.MCTSState import MCTSState
 
 
 def _init_grid():
@@ -8,7 +8,7 @@ def _init_grid():
 
 
 class NaughtCrossesState(MCTSState, ABC):
-    grid_size = 9
+    grid_size = 8
 
     def __init__(self, grid=None, player=True):
         self.grid = _init_grid() if grid is None else grid
@@ -38,7 +38,7 @@ class NaughtCrossesState(MCTSState, ABC):
 
         new_grid = self.grid.copy()
         new_grid[position] = self.player
-        return NaughtCrossesState(new_grid)
+        return NaughtCrossesState(new_grid, self.player)
 
     def has_won(self, symbol):
         starts = {

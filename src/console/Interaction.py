@@ -1,4 +1,4 @@
-from game.Actions import move
+from src.game.Actions import move
 
 
 def ask_to_choose_counter(state, player, console):

@@ -1,6 +1,6 @@
 import random
 
-from mcts.Node import Node
+from Node import Node
 
 
 def selection(node):
@@ -49,9 +49,10 @@ def expansion(node, choose=random.choice):
     return choose(node.get_children())
 
 
-def simulation(state, node, simulate):
+def simulation(state, node, simulate, simulation_method):
     """
     Simulate the game until there is a winner
+    :param simulation_method: function for choosing next node
     :param state: The current state of the game
     :param node: The expanded node chosen to start simulation
     :param simulate: Function that takes a state and node and returns a new state
@@ -66,11 +67,11 @@ def simulation(state, node, simulate):
     if len(new_state.get_valid_moves()) == 0:
         return node, None
 
-    move_id = random.choice(new_state.get_valid_moves())
+    move_id = simulation_method(new_state.get_valid_moves())
     player = new_state.get_player()
     new_node = Node(move_id, player, node)
 
-    return simulation(new_state, new_node, simulate)
+    return simulation(new_state, new_node, simulate, simulation_method)
 
 
 def backpropagation(node, winner):
