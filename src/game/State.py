@@ -1,5 +1,5 @@
-from src.game.Actions import Colour
-from src.game.Counter import Counter
+from game.Actions import Colour
+from game.Counter import Counter
 
 
 def _new_position(positions, checker, position):
@@ -63,12 +63,10 @@ class State:
         else:
             self._whitePositions = white_positions
 
-        if not hasattr(self, "_turn"):
-            self._turn = Colour.White
-        elif turn is not None:
+        if turn is not None:
             self._turn = turn
         else:
-            self.turn = self.check_turn()
+            self._turn = Colour.White
 
     def get_turn(self):
         return self._turn
@@ -77,7 +75,7 @@ class State:
         return self._turn
 
     def next_turn(self):
-        return State(self._blackPositions, self._whitePositions, not self._turn)
+        return State(self._blackPositions, self._whitePositions, Colour.Black if self._turn == Colour.White else Colour.Black)
 
     def get_position(self, color, counter_id):
 
@@ -183,6 +181,9 @@ class State:
             all_positions = [x.position for x in my_counters.values()] + [x.position for x in their_counters.values()]
 
             if position[0] < 0 or position[1] < 0:
+                return False
+
+            if position[0] >= self.board_size[0] or position[1] >= self.board_size[1]:
                 return False
 
             if position in all_positions:

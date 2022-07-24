@@ -29,9 +29,9 @@ class Console:
                 break
 
         if worker_thread.is_alive():
-            worker_thread.join()
+            worker_thread.join(5)
         print("Exiting console...")
-        time.sleep(10)
+        time.sleep(5)
         print("Exited.")
 
     def _work_wrapper(self):
